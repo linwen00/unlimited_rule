@@ -7584,36 +7584,34 @@
 					</div>
 				</div>
 				<p></p>
-				<div class="auto" id="auto">
+				<div class="auto" id="auto" v-show="auto.show">
 					<div class="text">▓▓▓▓自动破防:</div>
-					<div v-show="auto.show">
-						<div class="text">▓▓攻击方:</div>
-						<div class="text">▓文本:</div>
-						<div-input v-model="auto.attack.text" @blur="autoChange('attack')"></div-input>
-						<div class="text">▓识别:<p></p>{{auto.attack.result}}</div>
-						<p></p>
-						<div class="text">▓▓防御方:</div>
-						<div class="text">▓文本:</div>
-						<div-input v-model="auto.defense_text" @blur="autoChange('defense')"></div-input>
-						<div class="row" v-for="v, k in auto.defense" :key="k">
-							<div class="text">▓{{v.name}}:<p></p>
-							</div>
-							<div-input v-model="v.text" @blur="autoChange(k)"></div-input>
+					<div class="text">▓▓攻击方:</div>
+					<div class="text">▓文本:</div>
+					<div-input v-model="auto.attack.text" @blur="autoChange('attack')"></div-input>
+					<div class="text">▓识别:<p></p>{{auto.attack.result}}</div>
+					<p></p>
+					<div class="text">▓▓防御方:</div>
+					<div class="text">▓文本:</div>
+					<div-input v-model="auto.defense_text" @blur="autoChange('defense')"></div-input>
+					<div class="row" v-for="v, k in auto.defense" :key="k">
+						<div class="text">▓{{v.name}}:<p></p>
 						</div>
-						<div class="text">▓合计防御:<p></p>{{auto.defense_value}}</div>
-						<p></p>
-						<div class="text">▓▓结果:<p></p>
-							<div class="copy" @click="copy(auto.result.text)"></div>
-						</div>
-						<div class="row">
-							<div class="text">▓检定:</div>
-							<div class="div-input" contenteditable="true">{{auto.result.text}}</div>
-						</div>
-						<div class="text">▓剩余DP:<p></p>{{auto.result.value}}</div>
-						<div class="text">▓剩余高速:<p></p>{{auto.result.speed}}</div>
-						<div class="text">▓剩余破甲:<p></p>{{auto.result.armor}}</div>
-						<div class="text">▓剩余破魔:<p></p>{{auto.result.magic}}</div>
+						<div-input v-model="v.text" @blur="autoChange(k)"></div-input>
 					</div>
+					<div class="text">▓合计防御:<p></p>{{auto.defense_value}}</div>
+					<p></p>
+					<div class="text">▓▓结果:<p></p>
+						<div class="copy" @click="copy(auto.result.text)"></div>
+					</div>
+					<div class="row">
+						<div class="text">▓检定:</div>
+						<div class="div-input" contenteditable="true">{{auto.result.text}}</div>
+					</div>
+					<div class="text">▓剩余DP:<p></p>{{auto.result.value}}</div>
+					<div class="text">▓剩余高速:<p></p>{{auto.result.speed}}</div>
+					<div class="text">▓剩余破甲:<p></p>{{auto.result.armor}}</div>
+					<div class="text">▓剩余破魔:<p></p>{{auto.result.magic}}</div>
 				</div>
 				<p></p>
 				<div class="scale" id="scale">
@@ -7663,7 +7661,7 @@
 					<p></p>
 				</div>
 				<p></p>
-				<div class="help" id="help">
+				<div class="help" id="help" v-show="help.show">
 					<div class="row">▓▓▓▓使用说明:</div>
 					<div class="row">▓▓引用:</div>
 					<div class="row">
@@ -8951,6 +8949,7 @@
 				saveData() {
 					this.openAll()
 					this.auto.show = false
+					this.help.show = false
 					this.closeBuff()
 					setTimeout(() => {
 						this.saveFile(this.data.role.data[0].text + '.txt', this.getTxt())
