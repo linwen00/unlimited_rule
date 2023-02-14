@@ -7165,7 +7165,7 @@
 					'）': ')',
 					'：': ':',
 				}
-				return this.replace(/[（）：\s]/g, (a) => {
+				return this.trim().replace(/[（）：\s]/g, (a) => {
 					return r[a] ? r[a] : ''
 				})
 			}
@@ -7347,6 +7347,27 @@
 		<input ref="file" type="file" @change="loadData" class="hidden">
 		<input ref="copy" class="hidden" :value="copy_text">
 		<div class="left" ref="left" v-show="side">
+			<div class="monster">
+				<div class="row">怪物卡<button @click="createMonster">生成</button></div>
+				<div class="text">
+					支线等级
+					<select @change="monster.level = $event.srcElement.selectedOptions[0].value">
+						<option v-for="v, k in monster.select.level" :key="k" :value="k">{{v}}</option>
+					</select>
+				</div>
+				<div class="text">
+					模板类型
+					<select @change="monster.type = $event.srcElement.selectedOptions[0].value">
+						<option v-for="v, k in monster.select.type" :key="k" :value="k">{{v}}</option>
+					</select>
+				</div>
+				<div class="text">
+					攻击方式
+					<select @change="monster.attack = $event.srcElement.selectedOptions[0].value">
+						<option v-for="v, k in monster.select.attack" :key="k" :value="k">{{v}}</option>
+					</select>
+				</div>
+			</div>
 			<div class="action">
 				<div>
 					<button @click="saveData">导出txt</button>
@@ -7661,55 +7682,66 @@
 					<p></p>
 				</div>
 				<p></p>
-				<div class="help" id="help" v-show="help.show">
-					<div class="row">▓▓▓▓使用说明:</div>
-					<div class="row">▓▓引用:</div>
-					<div class="row">
-						<div class="text">▓词条:<p></p>
-						</div>
-						在▓与:之间的名词即为词条名，根据▓数量决定是什么级别的词条，如▓xxx:则xxx为词条名
+			</div>
+			<div class="help" id="help" v-show="help.show">
+				<div class="row">▓▓▓▓使用说明:</div>
+				<div class="row">▓▓词条:</div>
+				<div class="row">
+					<div class="text">▓词条名:<p></p>
 					</div>
-					<div class="row">
-						<div class="text">▓@:<p></p>
-						</div>
-						使用@引用[属性][技能][衍生属性][攻击][防御]里词条的数值或dp
+					在▓与:之间的名词即为词条名，根据▓数量决定是什么级别的词条，如▓xxx:则xxx为词条名
+				</div>
+				<div class="row">
+					<div class="text">▓添加词条:<p></p>
 					</div>
-					<div class="row">
-						<div class="text">▓引用副属性:<p></p>
-						</div>
-						@xxx为词条xxx的数值或dp， 若要引用[附加成功][武器伤害][破甲]，需要@xxx附加成功，@xxx武器伤害，@xxx破甲
+					点击<div class="add"></div>或<div class="add add2"></div>即可添加词条
+				</div>
+				<div class="row">
+					<div class="text">▓删除词条:<p></p>
 					</div>
-					<div class="row">
-						<div class="text">▓BUFF:<p></p>
-						</div>
-						BUFF子项里词条为引用， 开启后会给对应引用加值; 对于全检定BUFF，在一个检定中只会生效一次
+					将词条名清空即可删除词条
+				</div>
+				<div class="row">▓▓引用:</div>
+				<div class="row">
+					<div class="text">▓@:<p></p>
 					</div>
-					<div class="row">▓▓运算符:</div>
-					<div class="row">
-						<div class="text">▓ ~ :<p></p>
-						</div>
-						对应阶加算法，如5~=1+2+3+4+5=15， 运算优先级最高，通常只有传奇力量和传奇耐力会使用到阶加
+					使用@引用[属性][技能][衍生属性][攻击][防御]里词条的数值或dp
+				</div>
+				<div class="row">
+					<div class="text">▓引用副属性:<p></p>
 					</div>
-					<div class="row">
-						<div class="text">▓ * 和 / :<p></p>
-						</div>
-						对应乘法和除法， 运算优先级第二; 除法会去除小数点， 因此尽量把除法放最后
+					@xxx为词条xxx的数值或dp， 若要引用[附加成功][武器伤害][破甲]，需要@xxx附加成功，@xxx武器伤害，@xxx破甲
+				</div>
+				<div class="row">
+					<div class="text">▓BUFF:<p></p>
 					</div>
-					<div class="row">
-						<div class="text">▓ & 和 | :<p></p>
-						</div>
-						&为取两边较低数值， |为取两边较高数值， 运算优先级第三; 1&2=1; 1|2=2
+					BUFF子项里词条为引用， 开启后会给对应引用加值; 对于全检定BUFF，在一个检定中只会生效一次
+				</div>
+				<div class="row">▓▓运算符:</div>
+				<div class="row">
+					<div class="text">▓ ~ :<p></p>
 					</div>
-					<div class="row">
-						<div class="text">▓ + 和 - :<p></p>
-						</div>
-						对应加法和减法， 运算优先级最低
+					对应阶加算法，如5~=1+2+3+4+5=15， 运算优先级最高，通常只有传奇力量和传奇耐力会使用到阶加
+				</div>
+				<div class="row">
+					<div class="text">▓ * 和 / :<p></p>
 					</div>
-					<div class="row">
-						<div class="text">▓括号:<p></p>
-						</div>
-						括号值用于表达式，如xxx(自然数)，不能在括号里进行计算，但可以是负整数
+					对应乘法和除法， 运算优先级第二; 除法会去除小数点， 因此尽量把除法放最后
+				</div>
+				<div class="row">
+					<div class="text">▓ & 和 | :<p></p>
 					</div>
+					&为取两边较低数值， |为取两边较高数值， 运算优先级第三; 1&2=1; 1|2=2
+				</div>
+				<div class="row">
+					<div class="text">▓ + 和 - :<p></p>
+					</div>
+					对应加法和减法， 运算优先级最低
+				</div>
+				<div class="row">
+					<div class="text">▓括号:<p></p>
+					</div>
+					括号值用于表达式，如xxx(自然数)，不能在括号里进行计算，但可以是负整数
 				</div>
 			</div>
 		</div>
@@ -8152,9 +8184,39 @@
 						range: '范围',
 					},
 				}
+				const monster = {
+					select: {
+						level: ['无支线', 'D', 'C', 'B', 'A', 'S', 'SS', 'SSS'],
+						type: ['小怪', 'BOSS'],
+						attack: ['肉搏', '白刃', '枪械', '弓箭', '神秘学'],
+						attr: [
+							[4, 2, 1],
+							[6, 4, 2],
+							[11, 6, 4],
+							[16, 11, 6],
+							[21, 16, 8],
+							[26, 21, 11],
+							[36, 31, 21],
+							[66, 51, 36],
+						],
+						skill: [
+							[3, 2, 1],
+							[5, 3, 1],
+							[8, 4, 2],
+							[10, 5, 3],
+							[13, 8, 4],
+							[15, 10, 5],
+							[15, 13, 8],
+						],
+					},
+					level: 0,
+					type: 0,
+					attack: 0,
+				}
 				return {
 					init,
 					select,
+					monster,
 				}
 			},
 			components: {
@@ -8169,7 +8231,7 @@
 					},
 					methods: {
 						input() {
-							this.$emit('update:modelValue', this.$refs.input.innerText.toString())
+							this.$emit('update:modelValue', this.$refs.input.innerText.toString().trim())
 						},
 					},
 					template: '<div class="div-input" ref="input" contenteditable="true" @blur="input" :key="modelValue"><p v-for="item, index in list" :key="index">{{item}}</p></div>',
