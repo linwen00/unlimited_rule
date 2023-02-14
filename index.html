@@ -7490,6 +7490,7 @@
 								</div>
 								<div-input v-model="v.attach.text" @blur="updateText(v.dict + '.attach', 'attach')">
 								</div-input>
+								<div class="row">{{v.attach.buff}}</div>
 								<div class="text">={{v.attach._value}}</div>
 							</div>
 						</div>
@@ -7640,14 +7641,35 @@
 					<div v-show="data.scale.show">
 						<div v-for="v, k in data.scale.data" :key="k" :id="v.dict">
 							<div class="text">
-								▓▓<div-input v-model="v.name" @blur="updateName(v.dict, true)"></div-input>:
+								▓▓<div-input v-model="v.name" @blur="updateName(v.dict)"></div-input>:
 								<p></p>{{v.now}}
-								<p></p>/<p></p>{{v._value}}
+								<div class="text" v-show="v._value">
+									<p></p>/<p></p>{{v._value}}
+								</div>
+							</div>
+							<div v-show="v.hp">
+								<div class="text">
+									<p></p>
+									<p></p>完好<p></p>{{v.I}}
+								</div>
+								<div class="text">
+									<p></p>
+									<p></p>冲击<p></p>{{v.B}}
+								</div>
+								<div class="text">
+									<p></p>
+									<p></p>严重<p></p>{{v.L}}
+								</div>
+								<div class="text">
+									<p></p>
+									<p></p>恶性<p></p>{{v.A}}
+								</div>
 							</div>
 							<div class="row">
 								<div class="text">▓上限:<p></p>
 								</div>
 								<div-input v-model="v.text" @blur="updateText(v.dict, 'scale')"></div-input>
+								<div class="text">{{v.buff}}</div>
 								<div class="text">={{v._value}}</div>
 							</div>
 							<div>
@@ -7797,48 +7819,6 @@
 							]],
 							["购买记录", []]
 						],
-						"buff": [
-							["意志力基础用法", [
-								["全检定", "@意志力基础用法(0)"],
-								["完美防御", "@意志力基础用法(0)"],
-							]],
-							["一阶基因锁", [
-								["全检定", "@传奇智力(0)&@传奇感知(0)"],
-								["意志力基础用法", "@智力(0)&@感知(0)"],
-							]],
-							["二阶基因锁", [
-								["全检定", "@传奇智力(0)&@传奇感知(0)"],
-								["意志力基础用法", "@智力(0)|@感知(0)"],
-							]],
-							["三阶基因锁", [
-								["全检定", "@传奇智力(0)&@传奇感知(0)"],
-								["意志力基础用法", "@智力(0)|@感知(0)"],
-								["力量", "5"],
-								["白刃", "5"],
-							]],
-							["四阶基因锁初级", [
-								["全检定", "@传奇智力(0)&@传奇感知(0)"],
-								["意志力基础用法", "@智力(0)|@感知(0)"],
-								["力量", "5"],
-								["白刃", "5"],
-								["操控", "-1"],
-							]],
-							["格挡", [
-								["格挡防御", ""],
-								["盾牌防御", ""],
-							]],
-							["全力防御", [
-								["闪避防御", "@基础防御(0)"],
-							]],
-							["全力攻击", [
-								["近战攻击检定", "@力量(1)/2&@基础防御数值(1)"],
-								["基础防御", "-@力量(1)/2&@基础防御数值(1)"],
-							]],
-							["冲锋攻击", [
-								["近战攻击检定", "@力量(1)&@基础防御数值(1)&@基础速度"],
-								["基础防御", "-@力量(1)&@基础防御数值(1)&@基础速度"],
-							]],
-						],
 						"role": [
 							["姓名", ""],
 							["性别", ""],
@@ -7900,15 +7880,21 @@
 						],
 						"derive": [
 							["体积", "标准(5)"],
-							["基础速度", "@体积(5)+@敏捷(1)+@力量(1)+@传奇敏捷(0)*3"],
-							["陆行速度", "@基础速度(7)"],
+							["基础速度", "@体积(5)+@敏捷(6)+@力量(4)+@传奇敏捷(1)*3"],
+							["陆行速度", "@基础速度(18)"],
 							["飞行速度", ""],
-							["先攻", "@敏捷(1)+@沉着(1)+@传奇沉着(1)"],
+							["先攻", "@敏捷(6)+@沉着(1)+@传奇沉着(0)"],
 							["生命值上限", "@体积(5)+@耐力(1)+@传奇耐力(0)~"],
 							["意志值", "@决心(1)+@沉着(1)+@传奇决心(0)+@传奇沉着(0)"],
 							["敏感范围", "@感知(1)*10+@传奇感知(0)*20"],
 							["意志力基础用法", "3"],
-							["基础防御数值", "@敏捷(1)&@感知(1)"],
+							["基础防御数值", "@敏捷(6)&@感知(1)"],
+							["完好生命值", "@生命值完好(5)"],
+							["恶性生命值", "@生命值恶性(0)"],
+							["怪物A完好生命值", "@怪物A完好(-4)"],
+							["怪物A恶性生命值", "@怪物A恶性(10)"],
+							["反射豁免防御加值", "@防御总览(2)-@基础防御(1)-@闪避防御(1)-@洞察防御(0)-@格挡防御(0)"],
+							["意志力数值", "@意志力(2)"]
 						],
 						"check": [
 							["意志检定", [
@@ -7920,8 +7906,8 @@
 								["附加成功", "@传奇决心(0)+@传奇沉着(0)"]
 							]],
 							["反射豁免", [
-								["DP", "@敏捷(1)+@运动(0)"],
-								["附加成功", "@传奇敏捷(0)+@运动附加成功(0)"]
+								["DP", "@敏捷(6)+@运动(0)+@反射豁免防御加值(0)"],
+								["附加成功", "@传奇敏捷(1)+@运动附加成功(0)"]
 							]],
 							["强韧豁免", [
 								["DP", "@耐力(1)+@求生(0)"],
@@ -7936,26 +7922,11 @@
 								["附加成功", ""]
 							]]
 						],
-						"defense": [
-							[
-								["防御附加成功", "@传奇敏捷(0)+@传奇感知(0)"],
-								["基础防御", "@基础防御数值"],
-								["闪避防御", "@传奇敏捷(0)"],
-								["洞察防御", "@传奇感知(0)"],
-								["格挡防御", ""],
-								["盔甲防御", ""],
-								["天生防御", ""],
-								["招式防御", ""],
-								["完美防御", ""],
-							],
-							[],
-							["防御总览", []]
-						],
 						"attack": [
 							["白刃攻击", [
-								["DP", "@力量(1)+@白刃(0)+@白刃攻击武器伤害(0)+@近战攻击检定(0)"],
+								["DP", "@力量(4)+@白刃(0)+@白刃攻击武器伤害(0)+@近战攻击检定(0)"],
 								["附加成功", "@传奇力量(0)+@白刃附加成功(0)"],
-								["伤害上限", "@力量(1)+@白刃(0)+@白刃攻击武器伤害(0)"],
+								["伤害上限", "@力量(4)+@白刃(0)+@白刃攻击武器伤害(0)"],
 								["武器伤害", ""],
 								["高速", ""],
 								["破甲", ""],
@@ -7963,22 +7934,102 @@
 								["射程", ""],
 								["范围", ""],
 								["加骰", "10"],
-								["命中特殊效果", ""],
+								["命中额外特效", ""],
 								["武器基本属性", ""],
 								["武器特殊属性", ""],
 								["其他效果", ""]
+							]]
+						],
+						"defense": [
+							[
+								["防御附加成功", "@传奇敏捷(1)+@传奇感知(0)"],
+								["基础防御", "@基础防御数值(1)"],
+								["闪避防御", "@传奇敏捷(1)"],
+								["洞察防御", "@传奇感知(0)"],
+								["格挡防御", ""],
+								["盔甲防御", ""],
+								["天生防御", ""],
+								["招式防御", ""],
+								["完美防御", ""]
+							],
+							[
+								["其他防御", ""]
+							],
+							["防御总览", []]
+						],
+						"buff": [
+							["意志力基础用法", [
+								["全检定", "@意志力基础用法(3)"],
+								["完美防御", "@意志力基础用法(3)"]
 							]],
+							["一阶基因锁", [
+								["全检定", "@传奇智力(0)&@传奇感知(0)"],
+								["意志力基础用法", "@智力(1)&@感知(1)"]
+							]],
+							["二阶基因锁", [
+								["全检定", "@传奇智力(0)&@传奇感知(0)"],
+								["意志力基础用法", "@智力(1)|@感知(1)"]
+							]],
+							["三阶基因锁", [
+								["全检定", "@传奇智力(0)&@传奇感知(0)"],
+								["意志力基础用法", "@智力(1)|@感知(1)"],
+								["力量", "5"],
+								["白刃", "5"]
+							]],
+							["四阶基因锁初级", [
+								["全检定", "@传奇智力(0)&@传奇感知(0)"],
+								["意志力基础用法", "@智力(1)|@感知(1)"],
+								["力量", "5"],
+								["白刃", "5"],
+								["操控", "-1"]
+							]],
+							["格挡", [
+								["格挡防御", ""],
+								["盾牌防御", ""]
+							]],
+							["全力防御", [
+								["闪避防御", "@基础防御(1)"]
+							]],
+							["全力攻击", [
+								["近战攻击检定", "@力量(4)/2&@基础防御数值(1)"],
+								["基础防御", "-@力量(4)/2&@基础防御数值(1)"]
+							]],
+							["冲锋攻击", [
+								["近战攻击检定", "@力量(4)&@基础防御数值(1)&@基础速度(18)"],
+								["基础防御", "-@力量(4)&@基础防御数值(1)&@基础速度(18)"]
+							]],
+							["例子", [
+								["白刃攻击", "5"],
+								["白刃攻击附加成功", "1"],
+								["白刃攻击武器伤害", "2"],
+								["白刃攻击高速", "3"],
+								["白刃攻击射程", "4"],
+								["侦查检定", "5"],
+								["侦查检定附加成功", "1"],
+								["耐力", "3"],
+								["生命值上限", "6"],
+								["白刃", "5"],
+								["生命值", "10"]
+							]]
 						],
 						"scale": [
 							["生命值", [
-								["上限", "@生命值上限(0)"],
-								["记录", ""],
+								["上限", "@生命值上限(6)"],
+								["记录", "-1"]
 							]],
 							["意志力", [
-								["上限", "@意志值(0)"],
-								["记录", ""],
+								["上限", "@意志值(2)"],
+								["记录", ""]
 							]],
-						],
+							["怪物A", [
+								["上限", "@生命值上限(6)"],
+								["记录", "-10A"]
+							]],
+							["刻度", [
+								["上限", ""],
+								["记录", "+1+5"]
+							]]
+						]
 					}),
 					data: JSON.stringify({
 						role: {
@@ -8023,6 +8074,7 @@
 							show: true,
 							data: {},
 							remark: '',
+							value: 0,
 						},
 						buff: {
 							name: 'BUFF',
@@ -8097,6 +8149,11 @@
 						log: '',
 						buff: '',
 						now: '',
+						hp: false,
+						I: 0,
+						B: 0,
+						L: 0,
+						A: 0,
 					}),
 					attack: JSON.stringify({
 						name: '',
@@ -8267,6 +8324,8 @@
 					}
 					text = text.replace(/\+$/, '') + '=' + value
 					attach && (text += ' 防御附加成功(' + attach + ')')
+					this.updated = this.updated || this.data.defense.value != value
+					this.data.defense.value = value
 					return text
 				}
 			},
@@ -8353,6 +8412,7 @@
 					data.log = data.log.trim()
 					let i, s, v, m, log, t, type
 					if (!data.text.startsWith('@生命值') && !data.name.startsWith('生命值')) {
+						data.hp = false
 						log = data.log.replace(/[^\d\+\-]/g, '')
 						v = parseInt(eval(log)) || 0
 						data.now = data._value + v
@@ -8361,11 +8421,12 @@
 						}
 						return
 					}
+					data.hp = true
 					const now = {
 						I: 0,
 						B: 0,
 						L: 0,
-						A: 0
+						A: 0,
 					}
 					log = data.log.toUpperCase().replace(/[^\d\+\-LBA]/g, '')
 					type = true
@@ -8430,6 +8491,7 @@
 						if (now[i]) {
 							data.now += now[i] + i
 						}
+						data[i] = now[i]
 					}
 					data.now = data.now.replace('I', '完好')
 					if (forceUpdate) {
@@ -8608,8 +8670,14 @@
 						this.text[name] = dict ? dict + '.check.value' : dict
 					}
 					let i, t
-					for (let i in this.init.dict) {
-						t = this.init.dict[i]
+					const d = Object.assign({
+						I: '完好',
+						B: '冲击',
+						L: '严重',
+						A: '恶性',
+					}, this.init.dict)
+					for (let i in d) {
+						t = d[i]
 						if (typeof data[i] != 'undefined') {
 							if (typeof data[i] == 'object') {
 								this.text[name + t] = dict ? dict + '.' + i + '.value' : dict
@@ -8754,6 +8822,7 @@
 					}
 				},
 				computeDefense() {
+					const d = this.defense
 					for (let i in this.data.defense.data) {
 						this.updateText(this.data.defense.data[i].dict, 'defense')
 					}
@@ -8774,6 +8843,7 @@
 				},
 				updateText(name, type) {
 					this.console && console.log('updateText:' + name + ',' + type)
+					type == 'scale' && this.scaleChange(name)
 					const data = this.getData(name)
 					let res = this.computeText(data.text)
 					this.updated = this.updated || data.text != res.text
@@ -8787,7 +8857,6 @@
 					if (['attr', 'skill'].includes(type)) {
 						return this.updateAttach(name, type)
 					}
-					type == 'scale' && this.scaleChange(name)
 					this.computeUpdate()
 				},
 				getBuff(name, type) {
@@ -8801,7 +8870,6 @@
 					}
 					let i, j, x, y
 					const at = ['check', 'attack'].includes(type)
-					name += type == 'attach' ? '.attach' : '.value'
 					for (i in this.data.buff.data) {
 						x = this.data.buff.data[i]
 						if (!x.switch) {
@@ -8810,7 +8878,7 @@
 						for (j in x.data) {
 							y = x.data[j]
 							if (y.type) {
-								if (this.text[y.name] == name) {
+								if (this.text[y.name] == name || this.text[y.name] == name + '.value') {
 									data.buff += '+' + x.name + '(' + y.value + ')'
 									data.value += y.value
 									data._value += y.value
@@ -9013,9 +9081,16 @@
 					this.auto.show = false
 					this.help.show = false
 					this.closeBuff()
+					this.saveText()
+				},
+				saveText() {
 					setTimeout(() => {
-						this.saveFile(this.data.role.data[0].text + '.txt', this.getTxt())
-					}, 500)
+						if (this.updated) {
+							this.saveText()
+						} else {
+							this.saveFile(this.data.role.data[0].text + '.txt', this.getTxt())
+						}
+					}, 100)
 				},
 				saveFile(filename, text) {
 					const urlObject = window.URL || window.webkitURL || window
@@ -9262,7 +9337,13 @@
 							buff: '',
 							log: k[1][1],
 							now: '',
+							hp: false,
+							I: 0,
+							B: 0,
+							L: 0,
+							A: 0,
 						}
+						this.setName(this.getData(dict), name, dict)
 					}
 					for (i in arr.defense[0]) {
 						dict = data.defense.dict + '.data.' + i
@@ -9279,6 +9360,7 @@
 						t.old = t.name
 						this.setName(this.getData(dict), name, dict)
 					}
+					text['防御总览'] = data.defense.dict + '.value'
 					data.defense.remark = arr.defense[1][0] ? arr.defense[1][0][1] : ''
 					for (i in arr.attack) {
 						k = arr.attack[i][1]
