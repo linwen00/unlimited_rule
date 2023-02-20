@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
-<head>
+	<head>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+		<meta name="viewport"
+			content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 		<title></title>
 		<script>
 			var Vue = function(e) {
@@ -7168,6 +7169,9 @@
 					return r[a] ? r[a] : ''
 				})
 			}
+			Math.randomInt = function(min, max) {
+				return Math.floor(Math.random() * (max - min)) + min
+			}
 		</script>
 		<style>
 			* {
@@ -7339,7 +7343,7 @@
 			}
 		</style>
 	</head>
-<body id="app" class="row">
+	<body id="app" class="row">
 		<div class="message" v-show="message">
 			<div>{{message}}</div>
 		</div>
@@ -7347,7 +7351,7 @@
 		<input ref="copy" class="hidden" :value="copy_text">
 		<div class="left" ref="left" v-show="side">
 			<div class="monster">
-				<div class="row">怪物卡<button>生成</button></div>
+				<div class="row">怪物卡<button @click="createMonster">生成</button></div>
 				<div class="text">
 					支线等级
 					<select @change="monster.level = $event.srcElement.selectedOptions[0].value">
@@ -7395,7 +7399,7 @@
 							<a :href="'#' + vv.dict">{{vv.name}}</a>
 						</div>
 						<div class="child" v-if="vv.data" v-for="vvv, kkk in vv.data" :key="kkk">
-							<div class="row" v-show="v.show &amp;&amp; vv.show">
+							<div class="row" v-show="v.show && vv.show">
 								<a :href="'#' + vvv.dict">{{vvv.name}}</a>
 							</div>
 						</div>
@@ -7489,6 +7493,7 @@
 								</div>
 								<div-input v-model="v.attach.text" @blur="updateText(v.dict + '.attach', 'attach')">
 								</div-input>
+								<div class="row">{{v.attach.buff}}</div>
 								<div class="text">={{v.attach._value}}</div>
 							</div>
 						</div>
@@ -7580,12 +7585,12 @@
 						<div v-for="v, k in data.buff.data" :key="k" :id="v.dict">
 							<div class="text">
 								▓▓<div-input v-model="v.name" @blur="updateName(v.dict, true)"></div-input>:
-								<p></p><input type="checkbox" v-model="v.switch" @change="computeAll">
+								<p></p><input type="checkbox" v-model="v.switch" @change="computeAll" />
 							</div>
 							<div class="row" v-for="vv, kk in v.data" :key="kk" :id="vv.dict">
 								<div class="text">
 									▓<div v-if="!vv.type">{{vv.name}}</div>
-									<div-input v-else="" v-model="vv.name" @blur="updateName(vv.dict, true)"></div-input>:
+									<div-input v-else v-model="vv.name" @blur="updateName(vv.dict, true)"></div-input>:
 									<p>
 									</p>
 								</div>
@@ -7639,14 +7644,35 @@
 					<div v-show="data.scale.show">
 						<div v-for="v, k in data.scale.data" :key="k" :id="v.dict">
 							<div class="text">
-								▓▓<div-input v-model="v.name" @blur="updateName(v.dict, true)"></div-input>:
+								▓▓<div-input v-model="v.name" @blur="updateName(v.dict)"></div-input>:
 								<p></p>{{v.now}}
-								<p></p>/<p></p>{{v._value}}
+								<div class="text" v-show="v._value">
+									<p></p>/<p></p>{{v._value}}
+								</div>
+							</div>
+							<div v-show="v.hp">
+								<div class="text">
+									<p></p>
+									<p></p>完好<p></p>{{v.I}}
+								</div>
+								<div class="text">
+									<p></p>
+									<p></p>冲击<p></p>{{v.B}}
+								</div>
+								<div class="text">
+									<p></p>
+									<p></p>严重<p></p>{{v.L}}
+								</div>
+								<div class="text">
+									<p></p>
+									<p></p>恶性<p></p>{{v.A}}
+								</div>
 							</div>
 							<div class="row">
 								<div class="text">▓上限:<p></p>
 								</div>
 								<div-input v-model="v.text" @blur="updateText(v.dict, 'scale')"></div-input>
+								<div class="text">{{v.buff}}</div>
 								<div class="text">={{v._value}}</div>
 							</div>
 							<div>
@@ -7728,9 +7754,9 @@
 					对应乘法和除法， 运算优先级第二; 除法会去除小数点， 因此尽量把除法放最后
 				</div>
 				<div class="row">
-					<div class="text">▓ &amp; 和 | :<p></p>
+					<div class="text">▓ & 和 | :<p></p>
 					</div>
-					&amp;为取两边较低数值， |为取两边较高数值， 运算优先级第三; 1&amp;2=1; 1|2=2
+					&为取两边较低数值， |为取两边较高数值， 运算优先级第三; 1&2=1; 1|2=2
 				</div>
 				<div class="row">
 					<div class="text">▓ + 和 - :<p></p>
@@ -7749,12 +7775,9 @@
 				document.querySelector("head").outerHTML.toString(),
 				document.querySelector("body").outerHTML.toString(),
 			]
-		</script></body>
-<script>
-var script_data = {"role":{"name":"人物","dict":"role","show":true,"data":{"0":{"name":"姓名","dict":"role.data.0","text":"怪物"},"1":{"name":"概述","dict":"role.data.1","text":"怪物专业：怪物在攻击、调查、豁免检定上，总是视为有专业，专业加值1"}}},"attr":{"name":"属性","dict":"attr","show":true,"data":{"0":{"name":"心智属性","dict":"attr.data.0","show":false,"data":{"0":{"name":"智力","dict":"attr.data.0.data.0","text":"基础(1)","value":1,"_value":1,"attach":0,"buff":""},"1":{"name":"感知","dict":"attr.data.0.data.1","text":"基础(1)","value":1,"_value":1,"attach":0,"buff":""},"2":{"name":"决心","dict":"attr.data.0.data.2","text":"基础(1)","value":1,"_value":1,"attach":0,"buff":""}}},"1":{"name":"生理属性","dict":"attr.data.1","show":false,"data":{"0":{"name":"力量","dict":"attr.data.1.data.0","text":"基础(1)","value":1,"_value":1,"attach":0,"buff":""},"1":{"name":"敏捷","dict":"attr.data.1.data.1","text":"基础(1)","value":1,"_value":1,"attach":0,"buff":""},"2":{"name":"耐力","dict":"attr.data.1.data.2","text":"基础(1)","value":1,"_value":1,"attach":0,"buff":""}}},"2":{"name":"互动属性","dict":"attr.data.2","show":false,"data":{"0":{"name":"风度","dict":"attr.data.2.data.0","text":"基础(1)","value":1,"_value":1,"attach":0,"buff":""},"1":{"name":"操控","dict":"attr.data.2.data.1","text":"基础(1)","value":1,"_value":1,"attach":0,"buff":""},"2":{"name":"沉着","dict":"attr.data.2.data.2","text":"基础(1)","value":1,"_value":1,"attach":0,"buff":""}}}}},"skill":{"name":"技能","dict":"skill","show":true,"data":{"0":{"name":"心智系技能","dict":"skill.data.0","show":false,"data":{"0":{"name":"学识","dict":"skill.data.0.data.0","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""},"1":{"name":"电脑","dict":"skill.data.0.data.1","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""},"2":{"name":"手艺-子项A","dict":"skill.data.0.data.2","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""},"3":{"name":"调查","dict":"skill.data.0.data.3","value":1,"_value":1,"text":"1","major":"","attach":0,"buff":""},"4":{"name":"医学","dict":"skill.data.0.data.4","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""},"5":{"name":"神秘学","dict":"skill.data.0.data.5","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""},"6":{"name":"科学","dict":"skill.data.0.data.6","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""}}},"1":{"name":"生理系技能","dict":"skill.data.1","show":false,"data":{"0":{"name":"运动","dict":"skill.data.1.data.0","value":1,"_value":1,"text":"1","major":"","attach":0,"buff":""},"1":{"name":"肉搏","dict":"skill.data.1.data.1","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""},"2":{"name":"驾驶","dict":"skill.data.1.data.2","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""},"3":{"name":"枪械","dict":"skill.data.1.data.3","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""},"4":{"name":"手上功夫","dict":"skill.data.1.data.4","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""},"5":{"name":"隐藏","dict":"skill.data.1.data.5","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""},"6":{"name":"求生","dict":"skill.data.1.data.6","value":1,"_value":1,"text":"1","major":"","attach":0,"buff":""},"7":{"name":"白刃","dict":"skill.data.1.data.7","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""},"8":{"name":"弓箭","dict":"skill.data.1.data.8","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""}}},"2":{"name":"互动系技能","dict":"skill.data.2","show":false,"data":{"0":{"name":"动物沟通","dict":"skill.data.2.data.0","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""},"1":{"name":"感受","dict":"skill.data.2.data.1","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""},"2":{"name":"表达-子项A","dict":"skill.data.2.data.2","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""},"3":{"name":"胁迫","dict":"skill.data.2.data.3","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""},"4":{"name":"交际","dict":"skill.data.2.data.4","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""},"5":{"name":"掩饰","dict":"skill.data.2.data.5","value":0,"_value":0,"text":"","major":"","attach":0,"buff":""}}}}},"derive":{"name":"衍生属性","dict":"derive","show":true,"data":{"0":{"name":"体积","old":"体积","dict":"derive.data.0","text":"7","value":7,"_value":7,"buff":""},"1":{"name":"基础速度","old":"基础速度","dict":"derive.data.1","text":"@体积(7)+@敏捷(1)+@力量(1)+@传奇敏捷(0)*3+健步如飞(5)","value":14,"_value":14,"buff":""},"2":{"name":"先攻","old":"先攻","dict":"derive.data.2","text":"@敏捷(1)+@沉着(1)+@传奇沉着(0)+精通先攻(5)","value":7,"_value":7,"buff":""},"3":{"name":"生命值上限","old":"生命值上限","dict":"derive.data.3","text":"@体积(7)+@耐力(1)+@传奇耐力(0)~+死硬(2)","value":10,"_value":10,"buff":""},"4":{"name":"意志值","old":"意志值","dict":"derive.data.4","text":"@决心(1)+@沉着(1)+@传奇决心(0)+@传奇沉着(0)","value":2,"_value":2,"buff":""},"5":{"name":"体积差值","old":"体积差值","dict":"derive.data.5","text":"@体积(7)-标准(5)","value":2,"_value":2,"buff":""},"6":{"name":"体积补正","old":"体积补正","dict":"derive.data.6","text":"@体积差值(2)/2","value":1,"_value":1,"buff":""},"7":{"name":"基础防御补正","old":"基础防御补正","dict":"derive.data.7","text":"@敏捷(1)&@感知(1)+精通先攻(3)+@闪避防御补正(-1)&0","value":3,"_value":3,"buff":""},"8":{"name":"闪避防御补正","old":"闪避防御补正","dict":"derive.data.8","text":"@传奇敏捷(0)-@体积补正(1)","value":-1,"_value":-1,"buff":""}}},"check":{"name":"检定速查","dict":"check","show":true,"data":{"0":{"name":"意志检定","old":"意志检定","dict":"check.data.0","check":{"text":"@意志值(2)+@传奇决心(0)","value":2,"_value":2,"buff":""},"attach":{"text":"@传奇决心(0)+@传奇沉着(0)","value":0,"_value":0,"buff":""}},"1":{"name":"意志豁免","old":"意志豁免","dict":"check.data.1","check":{"text":"@意志值(2)+@传奇决心(0)+专业(1)","value":3,"_value":3,"buff":""},"attach":{"text":"@传奇决心(0)+@传奇沉着(0)","value":0,"_value":0,"buff":""}},"2":{"name":"反射豁免","old":"反射豁免","dict":"check.data.2","check":{"text":"@敏捷(1)+@运动(1)+专业(1)","value":3,"_value":3,"buff":""},"attach":{"text":"@传奇敏捷(0)+@运动附加成功(0)","value":0,"_value":0,"buff":""}},"3":{"name":"强韧豁免","old":"强韧豁免","dict":"check.data.3","check":{"text":"@耐力(1)+@求生(1)+专业(1)","value":3,"_value":3,"buff":""},"attach":{"text":"@传奇耐力(0)+@求生附加成功(0)","value":0,"_value":0,"buff":""}},"4":{"name":"侦察检定","old":"侦察检定","dict":"check.data.4","check":{"text":"@感知(1)+@调查(1)+专业(1)","value":3,"_value":3,"buff":""},"attach":{"text":"@传奇感知(0)+@调查附加成功(0)","value":0,"_value":0,"buff":""}}}},"attack":{"name":"攻击预设","dict":"attack","show":true,"data":{"0":{"name":"普通攻击","old":"普通攻击","dict":"attack.data.0","dice":"10","hit":"","base":"","special":"","remark":"","check":{"text":"@力量(1)+@肉搏(0)+专业(1)","value":2,"_value":2,"buff":""},"attach":{"text":"@传奇力量(0)+@肉搏附加成功(0)","value":0,"_value":0,"buff":""},"limit":{"text":"@力量(1)+@肉搏(0)+@普通攻击武器伤害(0)","value":1,"_value":1,"buff":""},"weapon":{"text":"0","value":0,"_value":0,"buff":""},"speed":{"text":"","value":0,"_value":0,"buff":""},"armor":{"text":"","value":0,"_value":0,"buff":""},"magic":{"text":"","value":0,"_value":0,"buff":""},"reach":{"text":"","value":0,"_value":0,"buff":""},"range":{"text":"","value":0,"_value":0,"buff":""}}}},"defense":{"name":"防御预设","dict":"defense","show":true,"data":{"0":{"name":"防御附加成功","old":"防御附加成功","dict":"defense.data.0","text":"@传奇敏捷(0)+@传奇感知(0)","value":0,"_value":0,"buff":""},"1":{"name":"基础防御","old":"基础防御","dict":"defense.data.1","text":"@基础防御补正(3)|0","value":3,"_value":3,"buff":""},"2":{"name":"闪避防御","old":"闪避防御","dict":"defense.data.2","text":"@闪避防御补正(-1)|0","value":0,"_value":0,"buff":""},"3":{"name":"洞察防御","old":"洞察防御","dict":"defense.data.3","text":"@传奇感知(0)","value":0,"_value":0,"buff":""},"4":{"name":"天生防御","old":"天生防御","dict":"defense.data.4","text":"","value":0,"_value":0,"buff":""},"5":{"name":"格挡防御","old":"格挡防御","dict":"defense.data.5","text":"","value":0,"_value":0,"buff":""}},"remark":""},"buff":{"name":"BUFF","dict":"buff","show":true,"data":{"0":{"name":"格挡","dict":"buff.data.0","show":false,"data":{"0":{"name":"格挡防御","dict":"buff.data.0.data.0","text":"@肉搏(0)","value":0,"_value":0,"type":"at","buff":""}},"switch":false}}},"scale":{"name":"计量槽","dict":"scale","show":true,"data":{"0":{"name":"怪物A","old":"A","dict":"scale.data.0","text":"@生命值上限(10)","value":10,"_value":10,"buff":"","log":"","now":"10完好"},"1":{"name":"怪物B","old":"B","dict":"scale.data.1","text":"@生命值上限(10)","value":10,"_value":10,"buff":"","log":"","now":"10完好"}}},"data":{"name":"▓▓","dict":"data","show":true,"data":{"0":{"name":"名词速记","dict":"data.data.0","show":true,"data":{}},"1":{"name":"专长","dict":"data.data.1","show":true,"data":{"0":{"name":"健步如飞","dict":"data.data.1.data.0","show":true,"data":{"0":{"name":"3","dict":"data.data.1.data.0.data.0","text":"前提：需求力量2\r\r\n1级：人物的基础移动速度增加5米。\r\r\n2级：人物在进行冲锋攻击时，在该次攻击检定中额外获得3DP专长加值。\r\r\n3级：人物可以以迅捷动作进行移动，但该次移动的距离最多不能超过人物的体积*2米。"}}},"1":{"name":"死硬","dict":"data.data.1.data.1","show":true,"data":{"0":{"name":"5","dict":"data.data.1.data.1.data.1","text":"前提：需求耐力3，决心3\r\r\n1级：人物在进行强韧检定时获得等同于本专长等级的专长加值。\r\r\n2级：人物的生命值增加1点，当本专长等级达到4级时再增加1点。\r\r\n3级：人物不会因为伤势失去意识，在进行强韧检定时额外获得1个附加成功。\r\r\n4级：人物在为毒素、药物、疾病或创伤效果所带来的不良状态点数和固有不良状态而进行对抗、豁免或移除它们时，人物的相关检定获得此专长等级/DP专长加值。\r\r\n5级：人物每1分钟就可以移除1点冲击伤害；每经过一次长休息，就可以使生命槽中等同于耐力值的严重伤害转为完好。当人物不再有“完好”生命值，则人物在所有检定上获得1DP士气加值。人物的生命值若恰好被恶性填满也不会死亡，之后哪怕受到1点冲击伤害也会死亡。"}}},"2":{"name":"警觉","dict":"data.data.1.data.2","show":true,"data":{"0":{"name":"3","dict":"data.data.1.data.2.data.2","text":"前提：需求感知3，调查技能2级\r\r\n1级：人物在进行调查技能相关检定时获得等同于本专长等级的专长加值。\r\r\n2级：人物在措手不及时可以保留最大等于本专长等级的基础防御。\r\r\n3级：人物获得D级免疫措手不及的能力。"}}},"3":{"name":"精通先攻","dict":"data.data.1.data.3","show":true,"data":{"0":{"name":"3","dict":"data.data.1.data.3.data.3","text":"前提：需求敏捷2\r\r\n1级：人物的先攻值提升等同于专长等级*1点。\r\r\n2级：当其他单位的先攻权与你相同时，则由你先行动，若对方拥有相同或类似的能力，则依旧参照先攻规则判定行动顺序。\r\r\n3级：人物的先攻值再提升2点，同时人物的基础防御提升3点。"}}}}}}}}
-var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"attr.data.0.data.0.attach","传奇智力":"attr.data.0.data.0.attach","感知":"attr.data.0.data.1.value","感知附加成功":"attr.data.0.data.1.attach","传奇感知":"attr.data.0.data.1.attach","决心":"attr.data.0.data.2.value","决心附加成功":"attr.data.0.data.2.attach","传奇决心":"attr.data.0.data.2.attach","力量":"attr.data.1.data.0.value","力量附加成功":"attr.data.1.data.0.attach","传奇力量":"attr.data.1.data.0.attach","敏捷":"attr.data.1.data.1.value","敏捷附加成功":"attr.data.1.data.1.attach","传奇敏捷":"attr.data.1.data.1.attach","耐力":"attr.data.1.data.2.value","耐力附加成功":"attr.data.1.data.2.attach","传奇耐力":"attr.data.1.data.2.attach","风度":"attr.data.2.data.0.value","风度附加成功":"attr.data.2.data.0.attach","传奇风度":"attr.data.2.data.0.attach","操控":"attr.data.2.data.1.value","操控附加成功":"attr.data.2.data.1.attach","传奇操控":"attr.data.2.data.1.attach","沉着":"attr.data.2.data.2.value","沉着附加成功":"attr.data.2.data.2.attach","传奇沉着":"attr.data.2.data.2.attach","学识":"skill.data.0.data.0.value","学识附加成功":"skill.data.0.data.0.attach","电脑":"skill.data.0.data.1.value","电脑附加成功":"skill.data.0.data.1.attach","手艺-子项A":"skill.data.0.data.2.value","手艺-子项A附加成功":"skill.data.0.data.2.attach","调查":"skill.data.0.data.3.value","调查附加成功":"skill.data.0.data.3.attach","医学":"skill.data.0.data.4.value","医学附加成功":"skill.data.0.data.4.attach","神秘学":"skill.data.0.data.5.value","神秘学附加成功":"skill.data.0.data.5.attach","科学":"skill.data.0.data.6.value","科学附加成功":"skill.data.0.data.6.attach","运动":"skill.data.1.data.0.value","运动附加成功":"skill.data.1.data.0.attach","肉搏":"skill.data.1.data.1.value","肉搏附加成功":"skill.data.1.data.1.attach","驾驶":"skill.data.1.data.2.value","驾驶附加成功":"skill.data.1.data.2.attach","枪械":"skill.data.1.data.3.value","枪械附加成功":"skill.data.1.data.3.attach","手上功夫":"skill.data.1.data.4.value","手上功夫附加成功":"skill.data.1.data.4.attach","隐藏":"skill.data.1.data.5.value","隐藏附加成功":"skill.data.1.data.5.attach","求生":"skill.data.1.data.6.value","求生附加成功":"skill.data.1.data.6.attach","白刃":"skill.data.1.data.7.value","白刃附加成功":"skill.data.1.data.7.attach","弓箭":"skill.data.1.data.8.value","弓箭附加成功":"skill.data.1.data.8.attach","动物沟通":"skill.data.2.data.0.value","动物沟通附加成功":"skill.data.2.data.0.attach","感受":"skill.data.2.data.1.value","感受附加成功":"skill.data.2.data.1.attach","表达-子项A":"skill.data.2.data.2.value","表达-子项A附加成功":"skill.data.2.data.2.attach","胁迫":"skill.data.2.data.3.value","胁迫附加成功":"skill.data.2.data.3.attach","交际":"skill.data.2.data.4.value","交际附加成功":"skill.data.2.data.4.attach","掩饰":"skill.data.2.data.5.value","掩饰附加成功":"skill.data.2.data.5.attach","体积":"derive.data.0.value","基础速度":"derive.data.1.value","先攻":"derive.data.2.value","生命值上限":"derive.data.3.value","意志值":"derive.data.4.value","意志检定":"check.data.0.check.value","意志检定附加成功":"check.data.0.attach.value","意志豁免":"check.data.1.check.value","意志豁免附加成功":"check.data.1.attach.value","反射豁免":"check.data.2.check.value","反射豁免附加成功":"check.data.2.attach.value","强韧豁免":"check.data.3.check.value","强韧豁免附加成功":"check.data.3.attach.value","防御附加成功":"defense.data.0.value","基础防御":"defense.data.1.value","闪避防御":"defense.data.2.value","洞察防御":"defense.data.3.value","天生防御":"defense.data.4.value","格挡防御":"defense.data.5.value","亵渎防御":"defense.data.6.value","普通攻击":"attack.data.0.check.value","普通攻击附加成功":"attack.data.0.attach.value","普通攻击伤害上限":"attack.data.0.limit.value","普通攻击武器伤害":"attack.data.0.weapon.value","普通攻击高速":"attack.data.0.speed.value","普通攻击破甲":"attack.data.0.armor.value","普通攻击破魔":"attack.data.0.magic.value","普通攻击射程":"attack.data.0.reach.value","普通攻击范围":"attack.data.0.range.value","check.data.4":false,"check.data.4附加成功":false,"侦擦检定":false,"侦擦检定附加成功":false,"derive.data.5":false,"体积差值":"derive.data.5.value","derive.data.6":false,"体积加值":false,"derive.data.7":false,"体积减值":"derive.data.7.value","侦察检定":"check.data.4.check.value","侦察检定附加成功":"check.data.4.attach.value","体积补正":"derive.data.6.value","基础防御数值":false,"derive.data.8":false,"闪避防御数值":false,"闪避防御补正":"derive.data.8.value","derive.data.9":"derive.data.9.value","基础防御补正":"derive.data.7.value"}
-</script>
-<script id="script">
+		</script>
+	</body>
+	<script id="script">
 		window.html.push(document.getElementById('script').outerHTML.toString())
 		window.vue = Vue.createApp({
 			setup() {
@@ -7798,48 +7821,6 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 								["非负重储物空间", []]
 							]],
 							["购买记录", []]
-						],
-						"buff": [
-							["意志力基础用法", [
-								["全检定", "@意志力基础用法(0)"],
-								["完美防御", "@意志力基础用法(0)"],
-							]],
-							["一阶基因锁", [
-								["全检定", "@传奇智力(0)&@传奇感知(0)"],
-								["意志力基础用法", "@智力(0)&@感知(0)"],
-							]],
-							["二阶基因锁", [
-								["全检定", "@传奇智力(0)&@传奇感知(0)"],
-								["意志力基础用法", "@智力(0)|@感知(0)"],
-							]],
-							["三阶基因锁", [
-								["全检定", "@传奇智力(0)&@传奇感知(0)"],
-								["意志力基础用法", "@智力(0)|@感知(0)"],
-								["力量", "5"],
-								["白刃", "5"],
-							]],
-							["四阶基因锁初级", [
-								["全检定", "@传奇智力(0)&@传奇感知(0)"],
-								["意志力基础用法", "@智力(0)|@感知(0)"],
-								["力量", "5"],
-								["白刃", "5"],
-								["操控", "-1"],
-							]],
-							["格挡", [
-								["格挡防御", ""],
-								["盾牌防御", ""],
-							]],
-							["全力防御", [
-								["闪避防御", "@基础防御(0)"],
-							]],
-							["全力攻击", [
-								["近战攻击检定", "@力量(1)/2&@基础防御数值(1)"],
-								["基础防御", "-@力量(1)/2&@基础防御数值(1)"],
-							]],
-							["冲锋攻击", [
-								["近战攻击检定", "@力量(1)&@基础防御数值(1)&@基础速度"],
-								["基础防御", "-@力量(1)&@基础防御数值(1)&@基础速度"],
-							]],
 						],
 						"role": [
 							["姓名", ""],
@@ -7902,15 +7883,21 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 						],
 						"derive": [
 							["体积", "标准(5)"],
-							["基础速度", "@体积(5)+@敏捷(1)+@力量(1)+@传奇敏捷(0)*3"],
-							["陆行速度", "@基础速度(7)"],
+							["基础速度", "@体积(5)+@敏捷(6)+@力量(4)+@传奇敏捷(1)*3"],
+							["陆行速度", "@基础速度(18)"],
 							["飞行速度", ""],
-							["先攻", "@敏捷(1)+@沉着(1)+@传奇沉着(1)"],
+							["先攻", "@敏捷(6)+@沉着(1)+@传奇沉着(0)"],
 							["生命值上限", "@体积(5)+@耐力(1)+@传奇耐力(0)~"],
 							["意志值", "@决心(1)+@沉着(1)+@传奇决心(0)+@传奇沉着(0)"],
 							["敏感范围", "@感知(1)*10+@传奇感知(0)*20"],
 							["意志力基础用法", "3"],
-							["基础防御数值", "@敏捷(1)&@感知(1)"],
+							["基础防御数值", "@敏捷(6)&@感知(1)"],
+							["完好生命值", "@生命值完好(5)"],
+							["恶性生命值", "@生命值恶性(0)"],
+							["怪物A完好生命值", "@怪物A完好(-4)"],
+							["怪物A恶性生命值", "@怪物A恶性(10)"],
+							["反射豁免防御加值", "@防御总览(2)-@基础防御(1)-@闪避防御(1)-@洞察防御(0)-@格挡防御(0)"],
+							["意志力数值", "@意志力(2)"]
 						],
 						"check": [
 							["意志检定", [
@@ -7922,8 +7909,8 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 								["附加成功", "@传奇决心(0)+@传奇沉着(0)"]
 							]],
 							["反射豁免", [
-								["DP", "@敏捷(1)+@运动(0)"],
-								["附加成功", "@传奇敏捷(0)+@运动附加成功(0)"]
+								["DP", "@敏捷(6)+@运动(0)+@反射豁免防御加值(0)"],
+								["附加成功", "@传奇敏捷(1)+@运动附加成功(0)"]
 							]],
 							["强韧豁免", [
 								["DP", "@耐力(1)+@求生(0)"],
@@ -7938,26 +7925,11 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 								["附加成功", ""]
 							]]
 						],
-						"defense": [
-							[
-								["防御附加成功", "@传奇敏捷(0)+@传奇感知(0)"],
-								["基础防御", "@基础防御数值"],
-								["闪避防御", "@传奇敏捷(0)"],
-								["洞察防御", "@传奇感知(0)"],
-								["格挡防御", ""],
-								["盔甲防御", ""],
-								["天生防御", ""],
-								["招式防御", ""],
-								["完美防御", ""],
-							],
-							[],
-							["防御总览", []]
-						],
 						"attack": [
 							["白刃攻击", [
-								["DP", "@力量(1)+@白刃(0)+@白刃攻击武器伤害(0)+@近战攻击检定(0)"],
+								["DP", "@力量(4)+@白刃(0)+@白刃攻击武器伤害(0)+@近战攻击检定(0)"],
 								["附加成功", "@传奇力量(0)+@白刃附加成功(0)"],
-								["伤害上限", "@力量(1)+@白刃(0)+@白刃攻击武器伤害(0)"],
+								["伤害上限", "@力量(4)+@白刃(0)+@白刃攻击武器伤害(0)"],
 								["武器伤害", ""],
 								["高速", ""],
 								["破甲", ""],
@@ -7965,22 +7937,102 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 								["射程", ""],
 								["范围", ""],
 								["加骰", "10"],
-								["命中特殊效果", ""],
+								["命中额外特效", ""],
 								["武器基本属性", ""],
 								["武器特殊属性", ""],
 								["其他效果", ""]
+							]]
+						],
+						"defense": [
+							[
+								["防御附加成功", "@传奇敏捷(1)+@传奇感知(0)"],
+								["基础防御", "@基础防御数值(1)"],
+								["闪避防御", "@传奇敏捷(1)"],
+								["洞察防御", "@传奇感知(0)"],
+								["格挡防御", ""],
+								["盔甲防御", ""],
+								["天生防御", ""],
+								["招式防御", ""],
+								["完美防御", ""]
+							],
+							[
+								["其他防御", ""]
+							],
+							["防御总览", []]
+						],
+						"buff": [
+							["意志力基础用法", [
+								["全检定", "@意志力基础用法(3)"],
+								["完美防御", "@意志力基础用法(3)"]
 							]],
+							["一阶基因锁", [
+								["全检定", "@传奇智力(0)&@传奇感知(0)"],
+								["意志力基础用法", "@智力(1)&@感知(1)"]
+							]],
+							["二阶基因锁", [
+								["全检定", "@传奇智力(0)&@传奇感知(0)"],
+								["意志力基础用法", "@智力(1)|@感知(1)"]
+							]],
+							["三阶基因锁", [
+								["全检定", "@传奇智力(0)&@传奇感知(0)"],
+								["意志力基础用法", "@智力(1)|@感知(1)"],
+								["力量", "5"],
+								["白刃", "5"]
+							]],
+							["四阶基因锁初级", [
+								["全检定", "@传奇智力(0)&@传奇感知(0)"],
+								["意志力基础用法", "@智力(1)|@感知(1)"],
+								["力量", "5"],
+								["白刃", "5"],
+								["操控", "-1"]
+							]],
+							["格挡", [
+								["格挡防御", ""],
+								["盾牌防御", ""]
+							]],
+							["全力防御", [
+								["闪避防御", "@基础防御(1)"]
+							]],
+							["全力攻击", [
+								["近战攻击检定", "@力量(4)/2&@基础防御数值(1)"],
+								["基础防御", "-@力量(4)/2&@基础防御数值(1)"]
+							]],
+							["冲锋攻击", [
+								["近战攻击检定", "@力量(4)&@基础防御数值(1)&@基础速度(18)"],
+								["基础防御", "-@力量(4)&@基础防御数值(1)&@基础速度(18)"]
+							]],
+							["例子", [
+								["白刃攻击", "5"],
+								["白刃攻击附加成功", "1"],
+								["白刃攻击武器伤害", "2"],
+								["白刃攻击高速", "3"],
+								["白刃攻击射程", "4"],
+								["侦查检定", "5"],
+								["侦查检定附加成功", "1"],
+								["耐力", "3"],
+								["生命值上限", "6"],
+								["白刃", "5"],
+								["生命值", "10"]
+							]]
 						],
 						"scale": [
 							["生命值", [
-								["上限", "@生命值上限(0)"],
-								["记录", ""],
+								["上限", "@生命值上限(6)"],
+								["记录", "-1"]
 							]],
 							["意志力", [
-								["上限", "@意志值(0)"],
-								["记录", ""],
+								["上限", "@意志值(2)"],
+								["记录", ""]
 							]],
-						],
+							["怪物A", [
+								["上限", "@生命值上限(6)"],
+								["记录", "-10A"]
+							]],
+							["刻度", [
+								["上限", ""],
+								["记录", "+1+5"]
+							]]
+						]
 					}),
 					data: JSON.stringify({
 						role: {
@@ -8025,6 +8077,7 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 							show: true,
 							data: {},
 							remark: '',
+							value: 0,
 						},
 						buff: {
 							name: 'BUFF',
@@ -8099,6 +8152,11 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 						log: '',
 						buff: '',
 						now: '',
+						hp: false,
+						I: 0,
+						B: 0,
+						L: 0,
+						A: 0,
 					}),
 					attack: JSON.stringify({
 						name: '',
@@ -8190,7 +8248,7 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 					select: {
 						level: ['无支线', 'D', 'C', 'B', 'A', 'S', 'SS', 'SSS'],
 						type: ['小怪', 'BOSS'],
-						attack: ['肉搏', '白刃', '枪械', '弓箭', '神秘学'],
+						attack: ['肉搏', '白刃', '枪械', '弓箭', '神秘学', '枪械(炮)'],
 						attr: [
 							[4, 2, 1],
 							[6, 4, 2],
@@ -8214,6 +8272,247 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 					level: 0,
 					type: 0,
 					attack: 0,
+					init: JSON.stringify({
+						"data": [
+							["名词速记", []],
+							["专长", []]
+						],
+						"role": [
+							["姓名", "怪物"],
+							["概述", ""]
+						],
+						"attr": [
+							["心智属性", [
+								["智力", ""],
+								["感知", ""],
+								["决心", ""]
+							]],
+							["生理属性", [
+								["力量", ""],
+								["敏捷", ""],
+								["耐力", ""]
+							]],
+							["互动属性", [
+								["风度", ""],
+								["操控", ""],
+								["沉着", ""]
+							]]
+						],
+						"skill": [
+							["心智系技能", [
+								["学识", "", ""],
+								["电脑", "", ""],
+								["手艺-子项A", "", ""],
+								["调查", "", ""],
+								["医学", "", ""],
+								["神秘学", "", ""],
+								["科学", "", ""]
+							]],
+							["生理系技能", [
+								["运动", "", ""],
+								["肉搏", "", ""],
+								["驾驶", "", ""],
+								["枪械", "", ""],
+								["手上功夫", "", ""],
+								["隐藏", "", ""],
+								["求生", "", ""],
+								["白刃", "", ""],
+								["弓箭", "", ""]
+							]],
+							["互动系技能", [
+								["动物沟通", "", ""],
+								["感受", "", ""],
+								["表达-子项A", "", ""],
+								["胁迫", "", ""],
+								["交际", "", ""],
+								["掩饰", "", ""]
+							]]
+						],
+						"derive": [
+							["支线等级", ""],
+							["武器伤害", ""],
+							["高速", ""],
+							["破甲", ""],
+							["破魔", ""],
+							["加骰", "10"],
+							["攻击", ""],
+							["防御", ""],
+							["减伤", ""],
+							["体积", "5"],
+							["体积差值", "@体积(5)-标准(5)"],
+							["体积补正", "@体积差值(0)/2"],
+							["天生防御补正", "@天生防御数值(0)+@体积补正(0)"],
+							["闪避防御补正", "@闪避防御数值(0)-@体积差值(0)/2"],
+							["基础防御补正", "@基础防御数值(1)+@闪避防御补正(0)-@闪避防御(0)"],
+							["近战攻击伤害上限", "@体积补正(0)"],
+							["基础防御数值", "@敏捷(1)&@感知(1)"],
+							["闪避防御数值", "@传奇敏捷(0)"],
+							["天生防御数值", ""],
+							["基础速度", "@体积(5)+@敏捷(1)+@力量(1)+@传奇敏捷(0)*3"],
+							["陆行速度", "@基础速度(7)"],
+							["飞行速度", ""],
+							["先攻", "@敏捷(1)+@沉着(1)+@传奇沉着(0)"],
+							["生命值上限", "@体积(5)+@耐力(1)+@传奇耐力(0)~"],
+							["意志值", "@决心(1)+@沉着(1)+@传奇决心(0)+@传奇沉着(0)"],
+						],
+						"check": [
+							["意志检定", [
+								["DP", "@意志值(2)+@传奇决心(0)"],
+								["附加成功", "@传奇决心(0)+@传奇沉着(0)"]
+							]],
+							["意志豁免", [
+								["DP", "@意志值(2)+@传奇决心(0)"],
+								["附加成功", "@传奇决心(0)+@传奇沉着(0)"]
+							]],
+							["反射豁免", [
+								["DP", "@敏捷(1)+@运动(1)"],
+								["附加成功", "@传奇敏捷(0)+@运动附加成功(0)"]
+							]],
+							["强韧豁免", [
+								["DP", "@耐力(1)+@求生(1)"],
+								["附加成功", "@传奇耐力(0)+@求生附加成功(0)"]
+							]],
+							["侦查检定", [
+								["DP", "@感知(1)+@调查(1)"],
+								["附加成功", "@传奇感知(0)+@调查附加成功(0)"]
+							]],
+							["力量检定", [
+								["DP", "@力量(1)+@体积补正(0)"],
+								["附加成功", "@传奇力量(0)"]
+							]],
+							["近战攻击命中检定", [
+								["DP", "-@体积补正(0)"],
+								["附加成功", ""]
+							]]
+						],
+						"attack": [
+							["肉搏攻击", [
+								["DP", "@力量(1)+@肉搏(0)+@肉搏攻击武器伤害(0)+@近战攻击检定(0)"],
+								["附加成功", "@传奇力量(0)+@肉搏附加成功(0)"],
+								["伤害上限", "@力量(1)+@肉搏(0)+@肉搏攻击武器伤害(0)+@近战攻击伤害上限(0)"],
+								["武器伤害", ""],
+								["高速", ""],
+								["破甲", ""],
+								["破魔", ""],
+								["射程", ""],
+								["范围", ""],
+								["加骰", "10"],
+								["命中额外特效", ""],
+								["武器基本属性", ""],
+								["武器特殊属性", ""],
+								["其他效果", ""]
+							]],
+							["白刃攻击", [
+								["DP", "@力量(1)+@白刃(0)+@白刃攻击武器伤害(0)"],
+								["附加成功", "@传奇力量(0)+@白刃附加成功(0)"],
+								["伤害上限", "@力量(1)+@白刃(0)+@白刃攻击武器伤害(0)+@近战攻击伤害上限(0)"],
+								["武器伤害", ""],
+								["高速", ""],
+								["破甲", ""],
+								["破魔", ""],
+								["射程", ""],
+								["范围", ""],
+								["加骰", "10"],
+								["命中额外特效", ""],
+								["武器基本属性", ""],
+								["武器特殊属性", ""],
+								["其他效果", ""]
+							]],
+							["枪械攻击", [
+								["DP", "@敏捷(1)+@枪械(0)+@枪械攻击武器伤害(0)"],
+								["附加成功", "@传奇敏捷(0)+@枪械附加成功(0)"],
+								["伤害上限", "@枪械(0)+@枪械攻击武器伤害(0)*2"],
+								["武器伤害", ""],
+								["高速", "5"],
+								["破甲", ""],
+								["破魔", ""],
+								["射程", ""],
+								["范围", ""],
+								["加骰", "10"],
+								["命中额外特效", ""],
+								["武器基本属性", ""],
+								["武器特殊属性", ""],
+								["其他效果", ""]
+							]],
+							["弓箭攻击", [
+								["DP", "@敏捷(1)+@弓箭(0)+@弓箭攻击武器伤害(0)"],
+								["附加成功", "@传奇敏捷(0)+@弓箭附加成功(0)"],
+								["伤害上限", "@弓箭(0)+@弓箭攻击武器伤害(0)*2+力量要求(0)"],
+								["武器伤害", ""],
+								["高速", ""],
+								["破甲", ""],
+								["破魔", ""],
+								["射程", ""],
+								["范围", ""],
+								["加骰", "10"],
+								["命中额外特效", ""],
+								["武器基本属性", ""],
+								["武器特殊属性", ""],
+								["其他效果", ""]
+							]],
+							["法术攻击", [
+								["DP", "@智力(1)+@神秘学(0)+@法术攻击武器伤害(0)"],
+								["附加成功", "@传奇智力(0)+@神秘学附加成功(0)"],
+								["伤害上限", "@智力(1)+@神秘学(0)+@法术攻击武器伤害(0)"],
+								["武器伤害", ""],
+								["高速", ""],
+								["破甲", ""],
+								["破魔", ""],
+								["射程", ""],
+								["范围", ""],
+								["加骰", "10"],
+								["命中额外特效", ""],
+								["武器基本属性", ""],
+								["武器特殊属性", ""],
+								["其他效果",
+									"武器伤害即威力值一般为D级2点，DD级3点，C级4点，CC级5点，B级6点，BB级8点，A级10点，AA级13点，S级16点。"
+								]
+							]],
+							["火炮攻击", [
+								["DP", "@智力(1)+@神秘学(0)+@火炮攻击武器伤害(0)"],
+								["附加成功", "@传奇智力(0)+@枪械附加成功(0)"],
+								["伤害上限", "@枪械(0)+@火炮攻击武器伤害(0)*2"],
+								["武器伤害", ""],
+								["高速", ""],
+								["破甲", ""],
+								["破魔", ""],
+								["射程", ""],
+								["范围", ""],
+								["加骰", "10"],
+								["命中额外特效", ""],
+								["武器基本属性", ""],
+								["武器特殊属性", ""],
+								["其他效果",
+									"造成范围伤害，伤害值为武器伤害，攻击者进行判定时，需减去目标除了基础防御、闪避防御、洞察防御以及格挡防御以外的防御进行判定，判定结果作为被攻击者进行反射对抗判定时的减值。"
+								]
+							]]
+						],
+						"defense": [
+							[
+								["防御附加成功", "@传奇敏捷(0)+@传奇感知(0)"],
+								["基础防御", "@基础防御补正(1)|0"],
+								["闪避防御", "@闪避防御补正(0)|0"],
+								["洞察防御", "@传奇感知(0)"],
+								["天生防御", "@天生防御补正(0)|0"],
+								["格挡防御", ""]
+							],
+							[
+								["其他防御", ""]
+							],
+							["防御总览", []]
+						],
+						"buff": [
+							["格挡", [
+								["格挡防御", "@白刃(0)|@肉搏(0)"]
+							]]
+						],
+						"scale": [
+							["生命值", [
+								["上限", "@生命值上限(6)"],
+								["记录", ""]
+							]]
+						]
+					}),
 				}
 				return {
 					init,
@@ -8269,6 +8568,8 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 					}
 					text = text.replace(/\+$/, '') + '=' + value
 					attach && (text += ' 防御附加成功(' + attach + ')')
+					this.updated = this.updated || this.data.defense.value != value
+					this.data.defense.value = value
 					return text
 				}
 			},
@@ -8350,11 +8651,89 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 				this.computeUpdate()
 			},
 			methods: {
+				createMonster() {
+					let i, j, k
+					const monster = JSON.parse(this.monster.init)
+					const level = this.monster.level
+					const type = this.monster.type
+					const attr = this.monster.select.attr[level]
+					const skill = this.monster.select.skill[level]
+					const attack = this.monster.attack
+					for (i in this.data.attr.data) {
+						for (j in this.data.attr.data[i].data) {
+							monster.attr[i][1][j][1] = attr[2]
+						}
+					}
+					let a = []
+					for (i in this.data.skill.data) {
+						for (j in this.data.skill.data[i].data) {
+							this.data.skill.data[i].data[j].name.match(/\-/) || a.push(i + '.' + j)
+						}
+					}
+					for (k = 0; k < 5; k++) {
+						i = Math.randomInt(0, a.length)
+						i = a[i].split('.')
+						a.splice(i, 1)
+						j = i[1]
+						i = i[0]
+						monster.skill[i][1][j][1] = skill[2]
+					}
+					for (k = 0; k < 4; k++) {
+						i = Math.randomInt(0, a.length)
+						i = a[i].split('.')
+						a.splice(i, 1)
+						j = i[1]
+						i = i[0]
+						monster.skill[i][1][j][1] = skill[1]
+					}
+					monster.skill[1][1][0][1] = skill[0]
+					monster.skill[1][1][6][1] = skill[0]
+					monster.skill[0][1][3][1] || (monster.skill[0][1][3][1] = skill[2])
+					if (attack <= 1) {
+						monster.attr[1][1][0][1] = attr[0]
+						monster.attr[1][1][2][1] = attr[0]
+						monster.attr[1][1][1][1] = attr[1]
+						monster.attr[0][1][1][1] = attr[1]
+						monster.attr[2][1][2][1] = attr[1]
+						if (attack >= 1) {
+							monster.skill[1][1][7][1] = skill[0]
+						} else {
+							monster.skill[1][1][1][1] = skill[0]
+						}
+					} else if (1 < attack && attack <= 3) {
+						monster.attr[1][1][1][1] = attr[0]
+						monster.attr[0][1][1][1] = attr[0]
+						monster.attr[1][1][0][1] = attr[1]
+						monster.attr[1][1][2][1] = attr[1]
+						monster.attr[2][1][2][1] = attr[1]
+						if (attack >= 3) {
+							monster.skill[1][1][8][1] = skill[0]
+						} else {
+							monster.skill[1][1][3][1] = skill[0]
+						}
+					} else if (attack == 4) {
+						monster.attr[0][1][0][1] = attr[0]
+						monster.attr[0][1][1][1] = attr[0]
+						monster.attr[0][1][2][1] = attr[1]
+						monster.attr[1][1][1][1] = attr[1]
+						monster.attr[2][1][0][1] = attr[1]
+						monster.skill[0][1][5][1] = skill[0]
+					} else {
+						monster.attr[0][1][0][1] = attr[0]
+						monster.attr[1][1][1][1] = attr[0]
+						monster.attr[0][1][1][1] = attr[1]
+						monster.attr[1][1][0][1] = attr[1]
+						monster.attr[1][1][2][1] = attr[1]
+						monster.skill[1][1][3][1] = skill[0]
+					}
+					this.createData(monster)
+				},
 				scaleChange(name, forceUpdate) {
 					const data = this.getData(name)
 					data.log = data.log.trim()
 					let i, s, v, m, log, t, type
 					if (!data.text.startsWith('@生命值') && !data.name.startsWith('生命值')) {
+						data.hp = false
 						log = data.log.replace(/[^\d\+\-]/g, '')
 						v = parseInt(eval(log)) || 0
 						data.now = data._value + v
@@ -8363,11 +8742,12 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 						}
 						return
 					}
+					data.hp = true
 					const now = {
 						I: 0,
 						B: 0,
 						L: 0,
-						A: 0
+						A: 0,
 					}
 					log = data.log.toUpperCase().replace(/[^\d\+\-LBA]/g, '')
 					type = true
@@ -8432,6 +8812,7 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 						if (now[i]) {
 							data.now += now[i] + i
 						}
+						data[i] = now[i]
 					}
 					data.now = data.now.replace('I', '完好')
 					if (forceUpdate) {
@@ -8610,8 +8991,14 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 						this.text[name] = dict ? dict + '.check.value' : dict
 					}
 					let i, t
-					for (let i in this.init.dict) {
-						t = this.init.dict[i]
+					const d = Object.assign({
+						I: '完好',
+						B: '冲击',
+						L: '严重',
+						A: '恶性',
+					}, this.init.dict)
+					for (let i in d) {
+						t = d[i]
 						if (typeof data[i] != 'undefined') {
 							if (typeof data[i] == 'object') {
 								this.text[name + t] = dict ? dict + '.' + i + '.value' : dict
@@ -8715,7 +9102,6 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 					this.forceUpdate()
 				},
 				computeAll() {
-					this.computeBuff()
 					this.computeAttr()
 					this.computeSkill()
 					this.computeDerive()
@@ -8723,6 +9109,7 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 					this.computeCheck()
 					this.computeAttack()
 					this.computeScale()
+					this.computeBuff()
 				},
 				computeBuff() {
 					for (let i in this.data.buff.data) {
@@ -8756,6 +9143,7 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 					}
 				},
 				computeDefense() {
+					const d = this.defense
 					for (let i in this.data.defense.data) {
 						this.updateText(this.data.defense.data[i].dict, 'defense')
 					}
@@ -8776,6 +9164,7 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 				},
 				updateText(name, type) {
 					this.console && console.log('updateText:' + name + ',' + type)
+					type == 'scale' && this.scaleChange(name)
 					const data = this.getData(name)
 					let res = this.computeText(data.text)
 					this.updated = this.updated || data.text != res.text
@@ -8789,7 +9178,6 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 					if (['attr', 'skill'].includes(type)) {
 						return this.updateAttach(name, type)
 					}
-					type == 'scale' && this.scaleChange(name)
 					this.computeUpdate()
 				},
 				getBuff(name, type) {
@@ -8803,7 +9191,6 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 					}
 					let i, j, x, y
 					const at = ['check', 'attack'].includes(type)
-					name += type == 'attach' ? '.attach' : '.value'
 					for (i in this.data.buff.data) {
 						x = this.data.buff.data[i]
 						if (!x.switch) {
@@ -8812,7 +9199,7 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 						for (j in x.data) {
 							y = x.data[j]
 							if (y.type) {
-								if (this.text[y.name] == name) {
+								if (this.text[y.name] == name || this.text[y.name] == name + '.value') {
 									data.buff += '+' + x.name + '(' + y.value + ')'
 									data.value += y.value
 									data._value += y.value
@@ -8844,7 +9231,7 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 				},
 				computeText(text) {
 					this.console && console.log('computeText:' + text)
-					text = text ? text.replaceText() : ''
+					text = text ? text.toString().replaceText() : ''
 					let i, a, b, value = start = 0
 					const data = []
 					text.replace(/[\+\*\/\&\|]|(?<!\()-/g, (match, index) => {
@@ -9015,9 +9402,16 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 					this.auto.show = false
 					this.help.show = false
 					this.closeBuff()
+					this.saveText()
+				},
+				saveText() {
 					setTimeout(() => {
-						this.saveFile(this.data.role.data[0].text + '.txt', this.getTxt())
-					}, 500)
+						if (this.updated) {
+							this.saveText()
+						} else {
+							this.saveFile(this.data.role.data[0].text + '.txt', this.getTxt())
+						}
+					}, 100)
 				},
 				saveFile(filename, text) {
 					const urlObject = window.URL || window.webkitURL || window
@@ -9264,7 +9658,13 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 							buff: '',
 							log: k[1][1],
 							now: '',
+							hp: false,
+							I: 0,
+							B: 0,
+							L: 0,
+							A: 0,
 						}
+						this.setName(this.getData(dict), name, dict)
 					}
 					for (i in arr.defense[0]) {
 						dict = data.defense.dict + '.data.' + i
@@ -9281,6 +9681,7 @@ var script_text = {"智力":"attr.data.0.data.0.value","智力附加成功":"att
 						t.old = t.name
 						this.setName(this.getData(dict), name, dict)
 					}
+					text['防御总览'] = data.defense.dict + '.value'
 					data.defense.remark = arr.defense[1][0] ? arr.defense[1][0][1] : ''
 					for (i in arr.attack) {
 						k = arr.attack[i][1]
